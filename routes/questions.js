@@ -2,6 +2,11 @@ var express = require('express');
 var router  = express.Router();
 var Question = require('../models/question');
 
+// The order of routes matter. The first route that matches
+// a given path will be used while the following routes will be ignored
+// Be careful with routes that have `:` in their path as it
+// signifies a wildcard match
+
 router.get('/new', function(req, res, next){
   res.render('questions/new');
 });
@@ -15,6 +20,17 @@ router.get('/', function(req, res, next) {
       next();
     } else {
       res.render('questions/', {questions: questions})
+    }
+  })
+})
+
+router.get('/:id', function (req, res, next) {
+  var questionId = req.params.id;
+  Question.findOne({_id: questionId}, function (err, question) {
+    if (err) {
+      next();
+    } else {
+      res.render('questions/show', {question: question});
     }
   })
 })
