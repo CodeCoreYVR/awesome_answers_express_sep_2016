@@ -4,3 +4,14 @@ block content
   h1= question.title
   p= question.description
   .created-at= `Created at: ${question.createdAt}`
+
+  h2 Answers
+  ul
+    li
+      form(action=`/questions/${question.id}/answers` method='POST')
+        .form-group
+          textarea(name='description')
+        input(type='submit' value='Submit Answer')
+
+    each answer in question.answers
+      li= answer.description

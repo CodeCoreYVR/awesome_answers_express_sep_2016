@@ -52,6 +52,37 @@ router.post('/', function(req, res, next){
   })
 });
 
+// Everything before `/answers` and after `/` will be put inside
+// the req.params object under the key questionId
+router.post('/:questionId/answers', function (req, res, next) {
+  // Step 1: We find the question that will own the answer
+
+  // The callback passed to Mongoose query methods receives the err and result
+  // argument in a very specific order. The error is always the pifirst argument.
+  // The is very typical of the callback pattern
+  Question.findOne({_id: req.params.questionId}, function (err, question) {
+    if (err) {
+      // Step 2: If doesn't find a question, let the app continue to 404 page
+      next(err);
+    } else {
+      // Step 3: Question having been found, push the properties of the answer
+      // inside the question.answers array
+      // This is how Mongoose creates sub-documents
+      question.answers.push({description: req.body.description});
+
+      // Step 4: Having modified the question, we save those changes
+      question.save(function (err, question) {
+        if (err) {
+          next(err);
+        } else {
+          // Step 5: We send the user back to originating question
+          res.redirect(`/questions/${question.id}`)
+        }
+      });
+    }
+  });
+})
+
 router.delete('/:id', function (req, res, next) {
   var questionId = req.params.id;
   Question.remove({_id: questionId}, function (err, question) {
