@@ -1,0 +1,11 @@
+extends ../layout
+
+block content
+  h1 Questions
+  ul
+    //- 👇 loop over each questions
+    each question in questions
+      li
+        h3
+          a(href=`/questions/${question.id}`)= question.title
+        .date= question.createdAt
