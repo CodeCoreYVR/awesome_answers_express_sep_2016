@@ -4,6 +4,7 @@ var favicon      = require('serve-favicon');
 var logger       = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
+var mongoose     = require('mongoose');
 
 // routes are like controllers in Rails
 var index     = require('./routes/index');
@@ -11,6 +12,11 @@ var users     = require('./routes/users');
 var questions = require('./routes/questions');
 
 var app = express();
+
+// Fixes deprecation warning
+// We need to tell Mongoose what library to use for Promises
+mongoose.Promise = global.Promise
+mongoose.connect('mongodb://localhost/awesome_answers')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
