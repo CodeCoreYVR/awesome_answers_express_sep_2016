@@ -9,3 +9,5 @@ block content
         h3
           a(href=`/questions/${question.id}`)= question.title
         .date= question.createdAt
+        form(action=`/questions/${question.id}?_method=DELETE` method='POST')
+          input(type='submit' value='Delete')

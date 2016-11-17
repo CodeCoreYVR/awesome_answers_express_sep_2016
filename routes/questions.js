@@ -36,4 +36,15 @@ router.post('/', function(req, res, next){
   })
 });
 
+router.delete('/:id', function (req, res, next) {
+  var questionId = req.params.id;
+  Question.remove({_id: questionId}, function (err, question) {
+    if (err) {
+      next();
+    } else {
+      res.redirect('/questions');
+    }
+  })
+})
+
 module.exports = router;
