@@ -9,6 +9,7 @@ var methodOverride = require('method-override');
 var passport       = require('passport');
 var LocalStrategy  = require('passport-local').Strategy;
 var session        = require('express-session');
+var flash          = require('connect-flash');
 
 // routes are like controllers in Rails
 var index     = require('./routes/index');
@@ -35,14 +36,22 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
-app.use(session({
-                  secret: 'keyboard cat',
-                  resave: false,
-                  saveUninitialized: true,
-                  cookie: { secure: true }
-                }));
+app.use(session({secret: 'notsupersecert',
+                        resave: false,
+                        saveUninitialized: false,
+                        cookie: { maxAge: 60000000000 }}));
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+app.use(function(req, res, next){
+  res.locals.success = req.flash('success').join(', ');
+  res.locals.info    = req.flash('info').join(', ');
+  res.locals.error   = req.flash('error').join(', ');
+  next();
+});
+
 
 var User = require('./models/user');
 
@@ -56,8 +65,8 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
-var passportVerifyCallback = function(username, password, done) {
-    User.findOne({ username: username }, function(err, user) {
+var passportVerifyCallback = function(email, password, done) {
+    User.findOne({ email: email }, function(err, user) {
       if (err) { return done(err); }
       if (!user) {
         return done(null, false, { message: 'Incorrect username.' });
@@ -72,11 +81,11 @@ var passportVerifyCallback = function(username, password, done) {
 passport.use(new LocalStrategy({usernameField: 'email'},
                                passportVerifyCallback));
 
-
 app.use('/', index);
 app.use('/users', users);
 app.use('/questions', questions);
 app.use('/sessions', sessions);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

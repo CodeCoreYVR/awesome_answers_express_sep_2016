@@ -13,4 +13,10 @@ html
         li
           a(href='/questions/new') New Question
     main
+      - if (success)
+        .alert.alert-success= success
+      - else if (info)
+        .alert.alert-info= info
+      - else if (error)
+        .alert.alert-danger= error
       block content
